@@ -28,7 +28,7 @@
     }
 
     #title {
-        font-size: 48px; /* Büyük yazı */
+        font-size: 48px;
         font-weight: bold;
         margin-bottom: 20px;
         color: #333;
@@ -43,22 +43,6 @@
         font-size: 24px;
         margin: 20px 0 40px 0;
         color: #444;
-        transition: all 0.5s ease;
-    }
-
-    /* Efektler */
-    .time-up {
-        color: #ff4444;
-        transform: scale(1.2);
-        animation: shake 0.5s infinite;
-    }
-
-    @keyframes shake {
-        0% { transform: translateX(0) scale(1.2); }
-        25% { transform: translateX(-5px) scale(1.2); }
-        50% { transform: translateX(5px) scale(1.2); }
-        75% { transform: translateX(-5px) scale(1.2); }
-        100% { transform: translateX(0) scale(1.2); }
     }
 
     #controls {
@@ -141,13 +125,13 @@
     }
 
     function playClick() {
+        // Her butona basıldığında ses çalsın
         clickSound.currentTime = 0;
-        clickSound.play();
+        clickSound.play().catch(e => console.log("Ses oynatılamadı:", e));
     }
 
     function startTimer() {
         playClick();
-        tacticText.classList.remove('time-up');
         clearInterval(interval);
         interval = setInterval(() => {
             if (timer > 0) {
@@ -155,8 +139,8 @@
                 updateDisplay();
             } else {
                 clearInterval(interval);
-                endSound.play();
-                tacticText.classList.add('time-up');
+                endSound.currentTime = 0;
+                endSound.play().catch(e => console.log("TimeEnd ses çalamadı:", e));
                 alert("Süre doldu!");
             }
         }, 1000);
@@ -171,9 +155,9 @@
         playClick();
         timer = Number(secondsInput.value) || 100;
         updateDisplay();
-        tacticText.classList.remove('time-up');
     }
 
+    // Başlangıçta 100 göster
     updateDisplay();
 
     startBtn.addEventListener('click', startTimer);
