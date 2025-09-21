@@ -32,6 +32,20 @@
         font-weight: bold;
         margin-bottom: 20px;
         color: #333;
+        transition: all 0.5s ease;
+    }
+
+    /* Sallama animasyonu */
+    .shake {
+        animation: shakeAnim 0.5s infinite;
+    }
+
+    @keyframes shakeAnim {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+        100% { transform: translateX(0); }
     }
 
     #timerDisplay {
@@ -114,6 +128,7 @@
     const resetBtn = document.getElementById('resetBtn');
     const secondsInput = document.getElementById('secondsInput');
     const tacticText = document.getElementById('tacticText');
+    const title = document.getElementById('title');
     const clickSound = document.getElementById('clickSound');
     const endSound = document.getElementById('endSound');
 
@@ -125,13 +140,13 @@
     }
 
     function playClick() {
-        // Her butona basıldığında ses çalsın
         clickSound.currentTime = 0;
         clickSound.play().catch(e => console.log("Ses oynatılamadı:", e));
     }
 
     function startTimer() {
         playClick();
+        title.classList.remove('shake');
         clearInterval(interval);
         interval = setInterval(() => {
             if (timer > 0) {
@@ -139,9 +154,10 @@
                 updateDisplay();
             } else {
                 clearInterval(interval);
+                // Süre dolunca başlık sallanır ve ses çalar
+                title.classList.add('shake');
                 endSound.currentTime = 0;
                 endSound.play().catch(e => console.log("TimeEnd ses çalamadı:", e));
-                alert("Süre doldu!");
             }
         }, 1000);
     }
@@ -155,9 +171,9 @@
         playClick();
         timer = Number(secondsInput.value) || 100;
         updateDisplay();
+        title.classList.remove('shake'); // Resetle sallamayı kaldır
     }
 
-    // Başlangıçta 100 göster
     updateDisplay();
 
     startBtn.addEventListener('click', startTimer);
