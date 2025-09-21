@@ -1,143 +1,184 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yumuyta Zamanlayıcı</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: #f0f0f0;
-            position: relative;
-            text-align: center;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yumuyta Zamanlayıcı</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: #f0f0f0;
+        text-align: center;
+        position: relative;
+    }
 
-        #header {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 14px;
-            color: #333;
-        }
+    #header {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 14px;
+        color: #333;
+    }
 
+    #title {
+        font-size: 48px; /* Büyük yazı */
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    #timerDisplay {
+        font-size: 80px;
+        margin: 20px 0;
+    }
+
+    #tacticText {
+        font-size: 24px;
+        margin: 20px 0 40px 0;
+        color: #444;
+        transition: all 0.5s ease;
+    }
+
+    /* Efektler */
+    .time-up {
+        color: #ff4444;
+        transform: scale(1.2);
+        animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+        0% { transform: translateX(0) scale(1.2); }
+        25% { transform: translateX(-5px) scale(1.2); }
+        50% { transform: translateX(5px) scale(1.2); }
+        75% { transform: translateX(-5px) scale(1.2); }
+        100% { transform: translateX(0) scale(1.2); }
+    }
+
+    #controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    input[type="number"] {
+        padding: 8px;
+        font-size: 18px;
+        width: 120px;
+        text-align: center;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        margin: 2px;
+    }
+
+    @media (max-width: 600px) {
+        #title {
+            font-size: 32px;
+        }
         #timerDisplay {
-            font-size: 80px;
-            margin: 20px 0;
+            font-size: 50px;
         }
-
-        #footer {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
-            color: #555;
+        #tacticText {
+            font-size: 18px;
+            margin: 15px 0 30px 0;
         }
-
-        #controls {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
         input[type="number"] {
-            padding: 8px;
-            font-size: 18px;
-            width: 120px;
-            text-align: center;
+            width: 80px;
         }
-
         button {
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            margin: 2px;
+            padding: 6px 12px;
+            font-size: 16px;
         }
-
-        @media (max-width: 600px) {
-            #timerDisplay {
-                font-size: 50px;
-            }
-            input[type="number"] {
-                width: 80px;
-            }
-            button {
-                padding: 6px 12px;
-                font-size: 16px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
-    <div id="header">Henry Games</div>
+<div id="header">Henry Games</div>
 
-    <div id="controls">
-        <input type="number" id="secondsInput" placeholder="Saniye" value="100">
-        <div id="timerDisplay">100</div>
-        <div>
-            <button id="startBtn">Başlat</button>
-            <button id="stopBtn">Durdur</button>
-            <button id="resetBtn">Sıfırla</button>
-        </div>
+<div id="title">Yumuyta Zamanlayıcısı</div>
+
+<div id="controls">
+    <input type="number" id="secondsInput" placeholder="Saniye" value="100">
+    <div id="timerDisplay">100</div>
+    <div id="tacticText">Seval teyzemin özel taktiği</div>
+    <div>
+        <button id="startBtn">Başlat</button>
+        <button id="stopBtn">Durdur</button>
+        <button id="resetBtn">Sıfırla</button>
     </div>
+</div>
 
-    <div id="footer">Seval teyzemin özel taktiği</div>
+<!-- Ses dosyaları -->
+<audio id="clickSound" src="SoundClip.wav"></audio>
+<audio id="endSound" src="TimeEnd.wav"></audio>
 
-    <!-- Ses dosyası -->
-    <audio id="alarmSound" src="soundclip.wav"></audio>
+<script>
+    const timerDisplay = document.getElementById('timerDisplay');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const secondsInput = document.getElementById('secondsInput');
+    const tacticText = document.getElementById('tacticText');
+    const clickSound = document.getElementById('clickSound');
+    const endSound = document.getElementById('endSound');
 
-    <script>
-        const timerDisplay = document.getElementById('timerDisplay');
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const secondsInput = document.getElementById('secondsInput');
-        const alarmSound = document.getElementById('alarmSound');
+    let timer = 100;
+    let interval;
 
-        let timer = 100;
-        let interval;
+    function updateDisplay() {
+        timerDisplay.textContent = timer;
+    }
 
-        function updateDisplay() {
-            timerDisplay.textContent = timer;
-        }
+    function playClick() {
+        clickSound.currentTime = 0;
+        clickSound.play();
+    }
 
-        function startTimer() {
-            clearInterval(interval);
-            interval = setInterval(() => {
-                if (timer > 0) {
-                    timer--;
-                    updateDisplay();
-                } else {
-                    clearInterval(interval);
-                    alarmSound.play(); // Zaman dolunca ses çal
-                    alert("Süre doldu!");
-                }
-            }, 1000);
-        }
+    function startTimer() {
+        playClick();
+        tacticText.classList.remove('time-up');
+        clearInterval(interval);
+        interval = setInterval(() => {
+            if (timer > 0) {
+                timer--;
+                updateDisplay();
+            } else {
+                clearInterval(interval);
+                endSound.play();
+                tacticText.classList.add('time-up');
+                alert("Süre doldu!");
+            }
+        }, 1000);
+    }
 
-        function stopTimer() {
-            clearInterval(interval);
-        }
+    function stopTimer() {
+        playClick();
+        clearInterval(interval);
+    }
 
-        function resetTimer() {
-            timer = Number(secondsInput.value) || 100;
-            updateDisplay();
-        }
-
-        // İlk başta 100 göster
+    function resetTimer() {
+        playClick();
+        timer = Number(secondsInput.value) || 100;
         updateDisplay();
+        tacticText.classList.remove('time-up');
+    }
 
-        startBtn.addEventListener('click', startTimer);
-        stopBtn.addEventListener('click', stopTimer);
-        resetBtn.addEventListener('click', resetTimer);
-    </script>
+    updateDisplay();
+
+    startBtn.addEventListener('click', startTimer);
+    stopBtn.addEventListener('click', stopTimer);
+    resetBtn.addEventListener('click', resetTimer);
+</script>
 </body>
 </html>
